@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>5to Mes Juntos</title>
+  <style>
+    body {
+      font-family: 'Georgia', serif;
+      background: linear-gradient(to right, #fceabb, #f8b500);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .sobre {
+      width: 300px;
+      height: 200px;
+      background: #fffaf0;
+      border: 3px solid #d4af37;
+      border-radius: 10px;
+      position: relative;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .sello {
+      font-size: 50px;
+      color: crimson;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      transition: transform 0.5s ease;
+    }
+
+    .carta {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 70%;
+      max-width: 600px;
+      background: #fffaf0;
+      border: 3px solid #d4af37;
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+      padding: 40px;
+      text-align: center;
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 0;
+      transition: all 1s ease;
+    }
+
+    .carta h1 {
+      color: #b22222;
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+
+    .carta p {
+      font-size: 1.2em;
+      line-height: 1.8;
+      color: #333;
+      white-space: pre-line;
+    }
+
+    .carta .firma {
+      margin-top: 30px;
+      font-style: italic;
+      color: #b22222;
+      font-size: 1.2em;
+    }
+
+    .carta.visible {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="sobre" id="sobre">
+    <div class="sello">❤</div>
+  </div>
+
+  <div class="carta" id="carta">
+    <h1>💌 Feliz 5to Mes Juntos 💌</h1>
+    <p>
+En este hermoso día, quiero darte las gracias por estar conmigo aún.
+Hemos pasado cosas difíciles, pero con la ayuda de Dios se fueron yendo.
+Quiero estar contigo para siempre y por siempre.
+    </p>
+    <div class="firma">Con todo mi amor, Jean 💕</div>
+  </div>
+
+  <script>
+    const sobre = document.getElementById('sobre');
+    const carta = document.getElementById('carta');
+
+    sobre.addEventListener('click', () => {
+      carta.classList.add('visible');
+      sobre.style.display = 'none';
+    });
+  </script>
+</body>
+</html>
