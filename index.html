@@ -1,110 +1,492 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>5to Mes Juntos</title>
-  <style>
-    body {
-      font-family: 'Georgia', serif;
-      background: linear-gradient(to right, #fceabb, #f8b500);
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Carta Romántica</title>
 
-    .sobre {
-      width: 300px;
-      height: 200px;
-      background: #fffaf0;
-      border: 3px solid #d4af37;
-      border-radius: 10px;
-      position: relative;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-      cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+<!-- Tipografía romántica -->
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
 
-    .sello {
-      font-size: 50px;
-      color: crimson;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      transition: transform 0.5s ease;
-    }
+<style>
+  :root{
+    --bg1:#fff0f6;
+    --bg2:#fff7f0;
+    --accent:#ff6b8a;
+    --accent-dark:#e84f73;
+    --paper:#fffdf7;
+    --shadow: rgba(0,0,0,0.12);
+  }
 
-    .carta {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 70%;
-      max-width: 600px;
-      background: #fffaf0;
-      border: 3px solid #d4af37;
-      border-radius: 15px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-      padding: 40px;
-      text-align: center;
-      transform: translate(-50%, -50%) scale(0);
-      opacity: 0;
-      transition: all 1s ease;
-    }
+  html,body{
+    height:100%;
+    margin:0;
+    font-family: "Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: radial-gradient(circle at 10% 10%, #fff6fb 0%, #fff0f6 20%, #fff7f0 60%, #fffefc 100%);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    color:#333;
+  }
 
-    .carta h1 {
-      color: #b22222;
-      font-size: 2em;
-      margin-bottom: 20px;
-    }
+  /* Ambient glow and vignette */
+  .scene{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    overflow:hidden;
+    padding:40px;
+  }
+  .vignette{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background: radial-gradient(ellipse at center, rgba(255,230,240,0.25) 0%, rgba(255,240,245,0.15) 40%, rgba(0,0,0,0.02) 100%);
+    mix-blend-mode:soft-light;
+  }
 
-    .carta p {
-      font-size: 1.2em;
-      line-height: 1.8;
-      color: #333;
-      white-space: pre-line;
-    }
+  /* Floating hearts */
+  .hearts {
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+  }
+  .heart {
+    position:absolute;
+    width:18px;
+    height:18px;
+    transform:translateY(0) rotate(0deg);
+    opacity:0.9;
+    animation: floatUp linear infinite;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.08));
+  }
+  @keyframes floatUp {
+    from { transform: translateY(30vh) scale(0.6) rotate(0deg); opacity:0; }
+    10% { opacity:0.9; }
+    to { transform: translateY(-20vh) scale(1.1) rotate(360deg); opacity:0; }
+  }
 
-    .carta .firma {
-      margin-top: 30px;
-      font-style: italic;
-      color: #b22222;
-      font-size: 1.2em;
-    }
+  /* Card container */
+  .card-wrap{
+    width:360px;
+    max-width:92vw;
+    perspective:1200px;
+    position:relative;
+    z-index:5;
+  }
 
-    .carta.visible {
-      transform: translate(-50%, -50%) scale(1);
-      opacity: 1;
-    }
-  </style>
+  /* Envelope / paper */
+  .envelope{
+    width:100%;
+    height:240px;
+    position:relative;
+    transform-style:preserve-3d;
+    transition: transform 900ms cubic-bezier(.2,.9,.3,1);
+  }
+
+  /* Paper texture */
+  .paper{
+    background: linear-gradient(180deg, var(--paper), #fff);
+    border-radius:12px;
+    box-shadow: 0 18px 40px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.6);
+    border:1px solid rgba(200,150,160,0.06);
+    height:100%;
+    position:relative;
+    overflow:hidden;
+  }
+
+  /* Envelope flap (front) */
+  .flap{
+    position:absolute;
+    left:50%;
+    top:0;
+    transform-origin:50% 0%;
+    width:120%;
+    height:120%;
+    transform: translateX(-50%) translateY(-10%) rotateX(0deg);
+    transition: transform 900ms cubic-bezier(.2,.9,.3,1);
+    z-index:6;
+    pointer-events:none;
+  }
+
+  .flap .triangle{
+    width:0;
+    height:0;
+    border-left:180px solid transparent;
+    border-right:180px solid transparent;
+    border-bottom:120px solid #ffeef2;
+    margin:0 auto;
+    filter: drop-shadow(0 8px 18px rgba(200,100,120,0.08));
+  }
+
+  /* Seal (heart) */
+  .seal{
+    position:absolute;
+    left:50%;
+    top:86px;
+    transform:translateX(-50%);
+    z-index:12;
+    cursor:pointer;
+    transition: transform 220ms ease;
+  }
+  .seal:active{ transform: translateX(-50%) scale(0.96); }
+
+  .heart-svg{
+    width:72px;
+    height:72px;
+    display:block;
+    filter: drop-shadow(0 6px 18px rgba(232,79,115,0.18));
+  }
+
+  /* When opened */
+  .envelope.open{
+    transform: translateY(-8px) rotateX(6deg);
+  }
+  .envelope.open .flap{
+    transform: translateX(-50%) translateY(-10%) rotateX(-160deg);
+    transition: transform 900ms cubic-bezier(.2,.9,.3,1);
+  }
+  .envelope.open .seal{
+    transform: translateX(-50%) translateY(-8px) scale(0.9);
+    opacity:0.95;
+  }
+
+  /* Inner message area */
+  .message{
+    position:absolute;
+    left:12px;
+    right:12px;
+    top:36px;
+    bottom:12px;
+    padding:28px 22px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,250,250,0.95));
+    border-radius:10px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+    transform: translateY(8px);
+    opacity:0;
+    transition: opacity 600ms ease 300ms, transform 600ms ease 300ms;
+    z-index:4;
+    pointer-events:none;
+  }
+  .envelope.open .message{
+    opacity:1;
+    transform: translateY(0);
+    pointer-events:auto;
+  }
+
+  /* Message text style */
+  .message .title{
+    font-family: "Great Vibes", cursive;
+    font-size:34px;
+    color:var(--accent-dark);
+    margin:0 0 6px 0;
+    letter-spacing:0.6px;
+  }
+  .message .body{
+    font-size:15px;
+    line-height:1.6;
+    color:#4b3b3b;
+    margin-top:6px;
+    white-space:pre-wrap;
+    min-height:86px;
+  }
+
+  /* Decorative corner flowers */
+  .decor{
+    position:absolute;
+    inset:auto;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+    z-index:2;
+  }
+  .corner{
+    position:absolute;
+    width:80px;
+    height:80px;
+    opacity:0.9;
+    filter: drop-shadow(0 6px 14px rgba(0,0,0,0.06));
+  }
+  .corner.left{ left:-18px; bottom:-18px; transform:rotate(-12deg); }
+  .corner.right{ right:-18px; top:-18px; transform:rotate(18deg); }
+
+  /* Confetti canvas overlay */
+  canvas.confetti {
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+    z-index:9;
+  }
+
+  /* Footer note */
+  .note{
+    margin-top:18px;
+    text-align:center;
+    color:#7a5a63;
+    font-size:13px;
+    opacity:0.95;
+  }
+
+  /* Small responsive tweaks */
+  @media (max-width:420px){
+    .card-wrap{ width:320px; }
+    .heart-svg{ width:64px; height:64px; top:80px; }
+    .message .title{ font-size:30px; }
+  }
+</style>
 </head>
 <body>
-  <div class="sobre" id="sobre">
-    <div class="sello">❤</div>
+  <div class="scene" aria-live="polite">
+    <div class="vignette"></div>
+
+    <!-- floating hearts -->
+    <div class="hearts" aria-hidden="true">
+      <!-- generate many hearts with inline SVG via JS -->
+    </div>
+
+    <div class="card-wrap" role="region" aria-label="Carta romántica">
+      <div class="envelope" id="envelope">
+        <div class="paper">
+          <!-- flap -->
+          <div class="flap" id="flap">
+            <div class="triangle"></div>
+          </div>
+
+          <!-- seal heart -->
+          <div class="seal" id="seal" role="button" tabindex="0" aria-pressed="false" aria-label="Abrir carta">
+            <svg class="heart-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <defs>
+                <linearGradient id="g1" x1="0" x2="1">
+                  <stop offset="0" stop-color="#ff9fb1"/>
+                  <stop offset="1" stop-color="#ff6b8a"/>
+                </linearGradient>
+              </defs>
+              <path d="M12 21s-7.5-4.6-9.2-7.1C-0.1 9.6 3.2 4 8.6 5.6 10.6 6.2 12 8 12 8s1.4-1.8 3.4-2.4C20.8 4 24.1 9.6 21.2 13.9 19.5 16.4 12 21 12 21z" fill="url(#g1)"/>
+              <circle cx="12" cy="12" r="11.2" fill="rgba(255,255,255,0.02)"/>
+            </svg>
+          </div>
+
+          <!-- message inside -->
+          <div class="message" id="message" aria-hidden="true">
+            <h2 class="title">Para ti</h2>
+            <div class="body" id="messageText" aria-live="polite"></div>
+          </div>
+
+          <!-- decorative corners -->
+          <svg class="corner left" viewBox="0 0 100 100" preserveAspectRatio="xMinYMin" aria-hidden="true">
+            <g fill="#ffdfe6">
+              <circle cx="18" cy="18" r="8" fill="#ffdfe6"/>
+              <circle cx="36" cy="28" r="6" fill="#ffeef2"/>
+              <path d="M10 60 C30 40, 60 40, 80 60" stroke="#ffdfe6" stroke-width="6" fill="none" stroke-linecap="round"/>
+            </g>
+          </svg>
+
+          <svg class="corner right" viewBox="0 0 100 100" preserveAspectRatio="xMinYMin" aria-hidden="true">
+            <g fill="#ffeef2">
+              <circle cx="82" cy="82" r="8" fill="#ffeef2"/>
+              <circle cx="64" cy="72" r="6" fill="#ffdfe6"/>
+              <path d="M20 40 C40 60, 70 60, 90 40" stroke="#ffdfe6" stroke-width="6" fill="none" stroke-linecap="round"/>
+            </g>
+          </svg>
+
+        </div>
+      </div>
+
+      <canvas class="confetti" id="confettiCanvas" width="800" height="600" aria-hidden="true"></canvas>
+
+      <div class="note">Haz clic en el corazón para abrir la carta</div>
+    </div>
+
+    <!-- decorative floating hearts container -->
+    <div style="position:absolute; inset:0; z-index:1; pointer-events:none;"></div>
   </div>
 
-  <div class="carta" id="carta">
-    <h1>💌 Feliz 5to Mes Juntos 💌</h1>
-    <p>
-En este hermoso día, quiero darte las gracias por estar conmigo aún.
-Hemos pasado cosas difíciles, pero con la ayuda de Dios se fueron yendo.
-Quiero estar contigo para siempre y por siempre.
-    </p>
-    <div class="firma">Con todo mi amor, Jean 💕</div>
-  </div>
+<script>
+  // Message content
+  const messageContent = `Feliz 5 mes vale, hoy es un dia en el que se cumple otro mes más donde nos seguimos amando, quiero seguir asi contigo, quisiera estar a lado tuyo para poder darte un gran abrazo, y un beso, espero disfrutes este dia pensando en lo felices que vamos a seguir siendo y que siempre sera asi, te amo mucho mi corazon de melon`;
 
-  <script>
-    const sobre = document.getElementById('sobre');
-    const carta = document.getElementById('carta');
+  // Elements
+  const envelope = document.getElementById('envelope');
+  const seal = document.getElementById('seal');
+  const messageText = document.getElementById('messageText');
+  const confettiCanvas = document.getElementById('confettiCanvas');
+  const flap = document.getElementById('flap');
 
-    sobre.addEventListener('click', () => {
-      carta.classList.add('visible');
-      sobre.style.display = 'none';
-    });
-  </script>
+  // Accessibility: toggle with keyboard
+  seal.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      seal.click();
+    }
+  });
+
+  // Typewriter effect
+  function typeWriter(text, el, speed=18){
+    el.textContent = '';
+    let i = 0;
+    const timer = setInterval(() => {
+      el.textContent += text.charAt(i);
+      i++;
+      if (i >= text.length) clearInterval(timer);
+    }, speed);
+  }
+
+  // Confetti system
+  const ctx = confettiCanvas.getContext('2d');
+  let W = confettiCanvas.width = confettiCanvas.clientWidth;
+  let H = confettiCanvas.height = confettiCanvas.clientHeight;
+  window.addEventListener('resize', () => {
+    W = confettiCanvas.width = confettiCanvas.clientWidth;
+    H = confettiCanvas.height = confettiCanvas.clientHeight;
+  });
+
+  function random(min, max){ return Math.random()*(max-min)+min; }
+
+  class Particle {
+    constructor(x,y,dx,dy,size,color,rot,rotSpeed){
+      this.x=x; this.y=y; this.dx=dx; this.dy=dy; this.size=size; this.color=color;
+      this.rot=rot; this.rotSpeed=rotSpeed; this.life=0; this.ttl= random(60,120);
+      this.shape = Math.random() > 0.5 ? 'rect' : 'circle';
+    }
+    update(){
+      this.x += this.dx;
+      this.y += this.dy;
+      this.dy += 0.12; // gravity
+      this.rot += this.rotSpeed;
+      this.life++;
+    }
+    draw(ctx){
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.rot);
+      ctx.fillStyle = this.color;
+      if(this.shape==='rect'){
+        ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size*0.6);
+      } else {
+        ctx.beginPath();
+        ctx.ellipse(0,0,this.size*0.6,this.size*0.9,0,0,Math.PI*2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+    alive(){ return this.life < this.ttl && this.y < H + 60; }
+  }
+
+  let particles = [];
+
+  function burst(x,y,amount=40){
+    const colors = ['#ff6b8a','#ffd166','#ff9fb1','#ffb3c6','#ffd1e0','#f6a5c0'];
+    for(let i=0;i<amount;i++){
+      const angle = random(-Math.PI, 0);
+      const speed = random(2,8);
+      const dx = Math.cos(angle)*speed + random(-1,1);
+      const dy = Math.sin(angle)*speed + random(-1,1);
+      const size = random(6,14);
+      const color = colors[Math.floor(random(0,colors.length))];
+      const rot = random(0,Math.PI*2);
+      const rotSpeed = random(-0.2,0.2);
+      particles.push(new Particle(x + random(-20,20), y + random(-10,10), dx, dy, size, color, rot, rotSpeed));
+    }
+  }
+
+  function confettiLoop(){
+    ctx.clearRect(0,0,W,H);
+    particles.forEach(p => { p.update(); p.draw(ctx); });
+    particles = particles.filter(p => p.alive());
+    requestAnimationFrame(confettiLoop);
+  }
+  confettiLoop();
+
+  // Floating hearts generation
+  const heartsContainer = document.querySelector('.hearts');
+  function createFloatingHearts(){
+    const count = 12;
+    for(let i=0;i<count;i++){
+      const el = document.createElementNS('http://www.w3.org/2000/svg','svg');
+      el.setAttribute('viewBox','0 0 24 24');
+      el.classList.add('heart');
+      const size = Math.floor(random(12,28));
+      el.style.width = size + 'px';
+      el.style.left = (Math.random()*100) + '%';
+      el.style.top = (60 + Math.random()*40) + '%';
+      el.style.animationDuration = (8 + Math.random()*10) + 's';
+      el.style.opacity = (0.5 + Math.random()*0.6);
+      el.innerHTML = `<path fill="${Math.random()>0.5? '#ff9fb1':'#ff6b8a'}" d="M12 21s-7.5-4.6-9.2-7.1C-0.1 9.6 3.2 4 8.6 5.6 10.6 6.2 12 8 12 8s1.4-1.8 3.4-2.4C20.8 4 24.1 9.6 21.2 13.9 19.5 16.4 12 21 12 21z"/>`;
+      heartsContainer.appendChild(el);
+    }
+  }
+  createFloatingHearts();
+
+  // Open/close logic
+  let opened = false;
+  function openEnvelope(){
+    if(opened) return;
+    opened = true;
+    envelope.classList.add('open');
+    seal.setAttribute('aria-pressed','true');
+    // small delay then typewriter and confetti
+    setTimeout(() => {
+      typeWriter(messageContent, messageText, 18);
+      // burst confetti from center of envelope
+      const rect = envelope.getBoundingClientRect();
+      const cx = rect.left + rect.width/2 - confettiCanvas.getBoundingClientRect().left;
+      const cy = rect.top + rect.height*0.35 - confettiCanvas.getBoundingClientRect().top;
+      burst(cx, cy, 60);
+      // additional gentle bursts
+      setTimeout(()=> burst(cx-40, cy+10, 36), 220);
+      setTimeout(()=> burst(cx+40, cy+6, 36), 420);
+    }, 420);
+  }
+
+  seal.addEventListener('click', openEnvelope);
+
+  // Also allow clicking the flap area to open
+  flap.addEventListener('click', openEnvelope);
+
+  // Small decorative pulse on seal to invite click
+  setInterval(() => {
+    if(opened) return;
+    seal.animate([
+      { transform: 'translateX(-50%) scale(1)' },
+      { transform: 'translateX(-50%) scale(1.06)' },
+      { transform: 'translateX(-50%) scale(1)' }
+    ], { duration: 1800, easing: 'ease-in-out' });
+  }, 2200);
+
+  // Gentle ambient floating of the envelope
+  (function floatEnvelope(){
+    envelope.animate([
+      { transform: 'translateY(0) rotateX(0deg)' },
+      { transform: 'translateY(-6px) rotateX(2deg)' },
+      { transform: 'translateY(0) rotateX(0deg)' }
+    ], { duration: 4200, iterations: Infinity, easing: 'ease-in-out' });
+  })();
+
+  // Optional: click outside to add tiny confetti showers
+  document.body.addEventListener('click', (e) => {
+    if(!opened && e.target !== seal && !seal.contains(e.target)) return;
+    // small extra sparkle
+    const rect = envelope.getBoundingClientRect();
+    const cx = rect.left + rect.width/2 - confettiCanvas.getBoundingClientRect().left;
+    const cy = rect.top + rect.height*0.35 - confettiCanvas.getBoundingClientRect().top;
+    burst(cx + random(-80,80), cy + random(-20,20), 12);
+  });
+
+  // Ensure canvas matches device pixel ratio for crispness
+  function fixCanvasDPR(){
+    const ratio = Math.max(1, window.devicePixelRatio || 1);
+    confettiCanvas.width = confettiCanvas.clientWidth * ratio;
+    confettiCanvas.height = confettiCanvas.clientHeight * ratio;
+    ctx.setTransform(ratio,0,0,ratio,0,0);
+  }
+  fixCanvasDPR();
+  window.addEventListener('resize', fixCanvasDPR);
+
+</script>
 </body>
 </html>
